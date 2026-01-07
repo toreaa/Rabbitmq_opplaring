@@ -30,6 +30,24 @@ export default function ModulePage() {
     if (!isModuleUnlocked(slug, loaded)) {
       router.push('/')
     }
+
+    // Check if there's a hash in the URL - if so, show content and scroll to section
+    if (typeof window !== 'undefined' && window.location.hash) {
+      setShowQuiz(false)
+      // Wait for content to render, then scroll
+      setTimeout(() => {
+        const hash = window.location.hash.slice(1)
+        const element = document.getElementById(hash)
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          // Highlight the section briefly
+          element.style.backgroundColor = 'rgba(255, 102, 0, 0.2)'
+          setTimeout(() => {
+            element.style.backgroundColor = ''
+          }, 2000)
+        }
+      }, 100)
+    }
   }, [slug, router])
 
   useEffect(() => {
