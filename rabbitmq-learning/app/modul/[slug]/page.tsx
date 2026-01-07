@@ -239,19 +239,34 @@ function renderMarkdown(markdown: string): string {
   // Horizontal rules
   html = html.replace(/^---$/gm, '<hr>')
 
-  // Tables
-  html = html.replace(/\|(.+)\|/g, (match) => {
-    const cells = match.split('|').filter(c => c.trim())
-    if (cells.every(c => /^[-:]+$/.test(c.trim()))) {
-      return '' // Skip separator row
+  // Tables - find table blocks and process them
+  html = html.replace(/(\|.+\|[\r\n]+)+/g, (tableBlock) => {
+    const lines = tableBlock.trim().split('\n').filter(line => line.trim())
+    if (lines.length < 2) return tableBlock
+
+    let headerRow = ''
+    let bodyRows = ''
+    let isFirstDataRow = true
+
+    for (const line of lines) {
+      const cells = line.split('|').filter(c => c.trim() !== '')
+
+      // Skip separator row (contains only dashes and colons)
+      if (cells.every(c => /^[\s-:]+$/.test(c))) {
+        continue
+      }
+
+      if (isFirstDataRow) {
+        // First row is header
+        headerRow = '<tr>' + cells.map(c => `<th>${c.trim().replace(/\*\*/g, '')}</th>`).join('') + '</tr>'
+        isFirstDataRow = false
+      } else {
+        // Rest are body rows
+        bodyRows += '<tr>' + cells.map(c => `<td>${c.trim().replace(/\*\*/g, '')}</td>`).join('') + '</tr>'
+      }
     }
-    const isHeader = cells.some(c => c.includes('**'))
-    const tag = isHeader ? 'th' : 'td'
-    const row = cells.map(c => `<${tag}>${c.trim().replace(/\*\*/g, '')}</${tag}>`).join('')
-    return `<tr>${row}</tr>`
-  })
-  html = html.replace(/(<tr>[\s\S]*?<\/tr>)+/g, (match) => {
-    return `<table><tbody>${match}</tbody></table>`
+
+    return `<table><thead>${headerRow}</thead><tbody>${bodyRows}</tbody></table>`
   })
 
   // Lists

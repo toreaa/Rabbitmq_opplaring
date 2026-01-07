@@ -78,7 +78,7 @@ export default function Home() {
                 </div>
                 <Link
                   href={`/modul/${nextModule.slug}`}
-                  className="px-6 py-3 bg-[#ff6600] hover:bg-[#ff8533] rounded-lg font-medium transition"
+                  className="px-6 py-3 bg-[#ff6600] hover:bg-[#ff8533] rounded-lg font-medium transition text-white whitespace-nowrap"
                 >
                   Start →
                 </Link>
