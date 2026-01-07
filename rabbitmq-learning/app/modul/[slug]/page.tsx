@@ -224,11 +224,18 @@ function renderMarkdown(markdown: string): string {
   // Inline code
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
 
-  // Headers
-  html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>')
-  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>')
-  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>')
-  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>')
+  // Headers - add id for anchor links
+  const slugify = (text: string) => text
+    .toLowerCase()
+    .replace(/[^\wæøå\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim()
+
+  html = html.replace(/^#### (.+)$/gm, (_, title) => `<h4 id="${slugify(title)}">${title}</h4>`)
+  html = html.replace(/^### (.+)$/gm, (_, title) => `<h3 id="${slugify(title)}">${title}</h3>`)
+  html = html.replace(/^## (.+)$/gm, (_, title) => `<h2 id="${slugify(title)}">${title}</h2>`)
+  html = html.replace(/^# (.+)$/gm, (_, title) => `<h1 id="${slugify(title)}">${title}</h1>`)
 
   // Bold
   html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')

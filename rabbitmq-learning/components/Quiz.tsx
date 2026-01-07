@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import confetti from 'canvas-confetti'
 import { QuizQuestion } from '@/lib/quiz-data'
 import { PASSING_SCORE } from '@/lib/progress'
@@ -12,6 +12,15 @@ interface QuizProps {
   alreadyPassed?: boolean
 }
 
+interface WrongAnswer {
+  questionIndex: number
+  question: string
+  yourAnswer: string
+  correctAnswer: string
+  sectionId?: string
+  sectionTitle?: string
+}
+
 export default function Quiz({ questions, moduleSlug, onComplete, alreadyPassed = false }: QuizProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
@@ -19,10 +28,11 @@ export default function Quiz({ questions, moduleSlug, onComplete, alreadyPassed 
   const [score, setScore] = useState(0)
   const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null))
   const [quizComplete, setQuizComplete] = useState(false)
+  const [wrongAnswers, setWrongAnswers] = useState<WrongAnswer[]>([])
 
   const question = questions[currentQuestion]
   const isCorrect = selectedAnswer === question.correctAnswer
-  const finalScore = score + (isCorrect ? 1 : 0)
+  const finalScore = score + (showResult && isCorrect ? 1 : 0)
   const passed = (finalScore / questions.length) >= PASSING_SCORE
 
   const handleSelect = (index: number) => {
@@ -38,8 +48,18 @@ export default function Quiz({ questions, moduleSlug, onComplete, alreadyPassed 
     newAnswers[currentQuestion] = selectedAnswer
     setAnswers(newAnswers)
 
-    if (isCorrect) {
+    if (selectedAnswer === question.correctAnswer) {
       setScore(prev => prev + 1)
+    } else {
+      // Track wrong answer
+      setWrongAnswers(prev => [...prev, {
+        questionIndex: currentQuestion,
+        question: question.question,
+        yourAnswer: question.options[selectedAnswer],
+        correctAnswer: question.options[question.correctAnswer],
+        sectionId: question.sectionId,
+        sectionTitle: question.sectionTitle
+      }])
     }
   }
 
@@ -51,7 +71,8 @@ export default function Quiz({ questions, moduleSlug, onComplete, alreadyPassed 
     } else {
       // Quiz complete
       setQuizComplete(true)
-      const finalScoreValue = score + (isCorrect ? 1 : 0)
+      const currentIsCorrect = selectedAnswer === question.correctAnswer
+      const finalScoreValue = score + (currentIsCorrect ? 1 : 0)
 
       if ((finalScoreValue / questions.length) >= PASSING_SCORE) {
         // Celebration confetti
@@ -73,6 +94,12 @@ export default function Quiz({ questions, moduleSlug, onComplete, alreadyPassed 
     setScore(0)
     setAnswers(new Array(questions.length).fill(null))
     setQuizComplete(false)
+    setWrongAnswers([])
+  }
+
+  const scrollToSection = (sectionId: string) => {
+    // Go back to content and scroll to section
+    window.location.href = `/modul/${moduleSlug}#${sectionId}`
   }
 
   if (quizComplete) {
@@ -80,7 +107,7 @@ export default function Quiz({ questions, moduleSlug, onComplete, alreadyPassed 
 
     return (
       <div className="bg-[#25252b] rounded-xl p-6 border border-[#393941]">
-        <div className="text-center">
+        <div className="text-center mb-6">
           <div className="text-6xl mb-4">
             {passed ? '🎉' : '📚'}
           </div>
@@ -107,23 +134,61 @@ export default function Quiz({ questions, moduleSlug, onComplete, alreadyPassed 
               Du trenger minst {Math.round(PASSING_SCORE * 100)}% for å bestå. Prøv igjen!
             </div>
           )}
+        </div>
 
-          <div className="flex justify-center gap-4">
-            <button
-              onClick={restartQuiz}
-              className="px-6 py-2 bg-[#393941] hover:bg-[#4c4c58] rounded-lg transition"
-            >
-              {passed ? 'Ta quizen på nytt' : 'Prøv igjen'}
-            </button>
-            {passed && (
-              <button
-                onClick={() => window.location.href = '/'}
-                className="px-6 py-2 bg-[#ff6600] hover:bg-[#ff8533] rounded-lg transition"
-              >
-                Tilbake til oversikt
-              </button>
-            )}
+        {/* Summary of wrong answers */}
+        {wrongAnswers.length > 0 && (
+          <div className="mb-6">
+            <h4 className="text-lg font-semibold mb-3 text-left">
+              📖 Oppsummering - {wrongAnswers.length} feil{wrongAnswers.length === 1 ? '' : ''}
+            </h4>
+            <div className="space-y-3">
+              {wrongAnswers.map((wrong, index) => (
+                <div
+                  key={index}
+                  className="bg-[#1a1a1f] rounded-lg p-4 text-left border border-[#393941]"
+                >
+                  <div className="text-sm text-gray-400 mb-1">
+                    Spørsmål {wrong.questionIndex + 1}
+                  </div>
+                  <div className="font-medium mb-2">{wrong.question}</div>
+                  <div className="text-sm space-y-1">
+                    <div className="text-red-400">
+                      ✗ Ditt svar: {wrong.yourAnswer}
+                    </div>
+                    <div className="text-green-400">
+                      ✓ Riktig svar: {wrong.correctAnswer}
+                    </div>
+                  </div>
+                  {wrong.sectionId && wrong.sectionTitle && (
+                    <button
+                      onClick={() => scrollToSection(wrong.sectionId!)}
+                      className="mt-3 text-sm text-[#ff6600] hover:text-[#ff8533] flex items-center gap-1 transition"
+                    >
+                      📖 Les mer: {wrong.sectionTitle} →
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
+        )}
+
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={restartQuiz}
+            className="px-6 py-2 bg-[#393941] hover:bg-[#4c4c58] rounded-lg transition text-white"
+          >
+            {passed ? 'Ta quizen på nytt' : 'Prøv igjen'}
+          </button>
+          {passed && (
+            <button
+              onClick={() => window.location.href = '/'}
+              className="px-6 py-2 bg-[#ff6600] hover:bg-[#ff8533] rounded-lg transition text-white"
+            >
+              Tilbake til oversikt
+            </button>
+          )}
         </div>
       </div>
     )
@@ -206,7 +271,17 @@ export default function Quiz({ questions, moduleSlug, onComplete, alreadyPassed 
           <div className="font-medium mb-1">
             {isCorrect ? '✓ Riktig!' : '✗ Feil svar'}
           </div>
-          <div className="text-sm text-gray-300">{question.explanation}</div>
+          <div className="text-sm text-gray-300 mb-2">{question.explanation}</div>
+
+          {/* Read more link for wrong answers */}
+          {!isCorrect && question.sectionId && question.sectionTitle && (
+            <button
+              onClick={() => scrollToSection(question.sectionId!)}
+              className="text-sm text-[#ff6600] hover:text-[#ff8533] flex items-center gap-1 transition mt-2"
+            >
+              📖 Les mer: {question.sectionTitle} →
+            </button>
+          )}
         </div>
       )}
 

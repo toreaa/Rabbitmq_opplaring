@@ -3,6 +3,8 @@ export interface QuizQuestion {
   options: string[]
   correctAnswer: number // 0-indexed
   explanation?: string
+  sectionId?: string // ID for å linke til relevant seksjon i innholdet
+  sectionTitle?: string // Tittel på seksjonen for visning
 }
 
 export interface ModuleQuiz {
@@ -21,7 +23,9 @@ export const quizzes: Record<string, QuizQuestion[]> = {
         'Direkte kobling mellom systemer'
       ],
       correctAnswer: 1,
-      explanation: 'Med en meldingskø kan System A sende meldingen og fortsette arbeidet uten å vente på at System B behandler den.'
+      explanation: 'Med en meldingskø kan System A sende meldingen og fortsette arbeidet uten å vente på at System B behandler den.',
+      sectionId: 'hva-er-en-meldingskø',
+      sectionTitle: 'Hva er en meldingskø?'
     },
     {
       question: 'Hva skjer med meldinger hvis mottakersystemet er nede?',
@@ -32,7 +36,9 @@ export const quizzes: Record<string, QuizQuestion[]> = {
         'Systemet krasjer'
       ],
       correctAnswer: 2,
-      explanation: 'En av hovedfordelene med meldingskøer er at meldinger lagres trygt til mottakeren er klar.'
+      explanation: 'En av hovedfordelene med meldingskøer er at meldinger lagres trygt til mottakeren er klar.',
+      sectionId: 'hvorfor-meldingskø',
+      sectionTitle: 'Hvorfor meldingskø?'
     },
     {
       question: 'Når er Kafka et bedre valg enn RabbitMQ?',
@@ -43,7 +49,9 @@ export const quizzes: Record<string, QuizQuestion[]> = {
         'For avansert routing'
       ],
       correctAnswer: 2,
-      explanation: 'Kafka er bedre for streaming, event sourcing og tilfeller der du trenger å kunne spille av hendelser på nytt.'
+      explanation: 'Kafka er bedre for streaming, event sourcing og tilfeller der du trenger å kunne spille av hendelser på nytt.',
+      sectionId: 'rabbitmq-vs-kafka',
+      sectionTitle: 'RabbitMQ vs Kafka'
     },
     {
       question: 'Hva er en "Exchange" i RabbitMQ?',
@@ -54,7 +62,9 @@ export const quizzes: Record<string, QuizQuestion[]> = {
         'En backup-mekanisme'
       ],
       correctAnswer: 1,
-      explanation: 'Exchange mottar meldinger fra produsenter og router dem til riktige køer basert på regler.'
+      explanation: 'Exchange mottar meldinger fra produsenter og router dem til riktige køer basert på regler.',
+      sectionId: 'nøkkelbegreper',
+      sectionTitle: 'Nøkkelbegreper'
     },
     {
       question: 'Hva er forskjellen mellom RabbitMQ og Kafka sin modell?',
@@ -65,7 +75,9 @@ export const quizzes: Record<string, QuizQuestion[]> = {
         'RabbitMQ støtter ikke køer'
       ],
       correctAnswer: 0,
-      explanation: 'RabbitMQ er en message queue (sletter etter levering), mens Kafka er en event log (beholder meldinger).'
+      explanation: 'RabbitMQ er en message queue (sletter etter levering), mens Kafka er en event log (beholder meldinger).',
+      sectionId: 'rabbitmq-vs-kafka',
+      sectionTitle: 'RabbitMQ vs Kafka'
     }
   ],
 
@@ -79,7 +91,9 @@ export const quizzes: Record<string, QuizQuestion[]> = {
         'Det er enklere å konfigurere'
       ],
       correctAnswer: 1,
-      explanation: 'Odde antall noder sikrer at flertallet kan avgjøre beslutninger ved quorum-avstemning.'
+      explanation: 'Odde antall noder sikrer at flertallet kan avgjøre beslutninger ved quorum-avstemning.',
+      sectionId: 'broker-node',
+      sectionTitle: 'Broker (Node)'
     },
     {
       question: 'Hva isolerer IKKE en Virtual Host (vhost)?',
@@ -90,7 +104,9 @@ export const quizzes: Record<string, QuizQuestion[]> = {
         'Minne og CPU-ressurser'
       ],
       correctAnswer: 3,
-      explanation: 'Vhosts gir logisk isolering av køer, exchanges og brukere, men deler fysiske ressurser som minne og CPU.'
+      explanation: 'Vhosts gir logisk isolering av køer, exchanges og brukere, men deler fysiske ressurser som minne og CPU.',
+      sectionId: 'virtual-host-vhost',
+      sectionTitle: 'Virtual Host (vhost)'
     },
     {
       question: 'Hva er best practice for connections og channels?',
@@ -101,7 +117,9 @@ export const quizzes: Record<string, QuizQuestion[]> = {
         'Så mange connections som mulig'
       ],
       correctAnswer: 1,
-      explanation: 'Connections er tunge å opprette. Best practice er å gjenbruke én connection og ha én channel per tråd.'
+      explanation: 'Connections er tunge å opprette. Best practice er å gjenbruke én connection og ha én channel per tråd.',
+      sectionId: 'connection-og-channel',
+      sectionTitle: 'Connection og Channel'
     },
     {
       question: 'Hvilken queue-type er anbefalt for produksjon?',
@@ -112,7 +130,9 @@ export const quizzes: Record<string, QuizQuestion[]> = {
         'Temporary Queue'
       ],
       correctAnswer: 2,
-      explanation: 'Quorum queues replikerer data til alle noder og tåler node-feil, noe som gjør dem ideelle for produksjon.'
+      explanation: 'Quorum queues replikerer data til alle noder og tåler node-feil, noe som gjør dem ideelle for produksjon.',
+      sectionId: 'queue',
+      sectionTitle: 'Queue'
     },
     {
       question: 'Hva er en "Binding" i RabbitMQ?',
@@ -123,7 +143,9 @@ export const quizzes: Record<string, QuizQuestion[]> = {
         'En bruker-rettighet'
       ],
       correctAnswer: 1,
-      explanation: 'Bindings definerer reglene for hvordan meldinger rutes fra exchanges til køer.'
+      explanation: 'Bindings definerer reglene for hvordan meldinger rutes fra exchanges til køer.',
+      sectionId: 'binding',
+      sectionTitle: 'Binding'
     },
     {
       question: 'I et 3-node cluster, hvor mange noder kan være nede samtidig uten datatap med quorum queues?',
@@ -134,7 +156,9 @@ export const quizzes: Record<string, QuizQuestion[]> = {
         '3 noder'
       ],
       correctAnswer: 1,
-      explanation: 'Med 3 noder kan 1 node være nede (2 av 3 er fortsatt oppe = flertall/quorum).'
+      explanation: 'Med 3 noder kan 1 node være nede (2 av 3 er fortsatt oppe = flertall/quorum).',
+      sectionId: 'cluster-arkitektur',
+      sectionTitle: 'Cluster-arkitektur'
     }
   ],
 
