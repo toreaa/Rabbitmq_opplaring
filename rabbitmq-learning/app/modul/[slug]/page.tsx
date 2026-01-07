@@ -227,7 +227,10 @@ function renderMarkdown(markdown: string): string {
   // Headers - add id for anchor links
   const slugify = (text: string) => text
     .toLowerCase()
-    .replace(/[^\wæøå\s-]/g, '')
+    .replace(/æ/g, 'ae')
+    .replace(/ø/g, 'o')
+    .replace(/å/g, 'a')
+    .replace(/[^\w\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .trim()

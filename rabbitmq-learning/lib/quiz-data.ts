@@ -24,7 +24,7 @@ export const quizzes: Record<string, QuizQuestion[]> = {
       ],
       correctAnswer: 1,
       explanation: 'Med en meldingskø kan System A sende meldingen og fortsette arbeidet uten å vente på at System B behandler den.',
-      sectionId: 'hva-er-en-meldingskø',
+      sectionId: 'hva-er-en-meldingsko',
       sectionTitle: 'Hva er en meldingskø?'
     },
     {
@@ -37,7 +37,7 @@ export const quizzes: Record<string, QuizQuestion[]> = {
       ],
       correctAnswer: 2,
       explanation: 'En av hovedfordelene med meldingskøer er at meldinger lagres trygt til mottakeren er klar.',
-      sectionId: 'hvorfor-meldingskø',
+      sectionId: 'hvorfor-meldingsko',
       sectionTitle: 'Hvorfor meldingskø?'
     },
     {
@@ -63,7 +63,7 @@ export const quizzes: Record<string, QuizQuestion[]> = {
       ],
       correctAnswer: 1,
       explanation: 'Exchange mottar meldinger fra produsenter og router dem til riktige køer basert på regler.',
-      sectionId: 'nøkkelbegreper',
+      sectionId: 'nokkelbegreper',
       sectionTitle: 'Nøkkelbegreper'
     },
     {
